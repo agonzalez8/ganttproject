@@ -1,0 +1,11 @@
+ID,Name,Begin date,End date,Web Link,Notes,Completion,Coordinator,Resources,Assignments,Duration,Predecessors,Outline number,Cost,Task color,Priority,Is critical
+1,Project kickoff,6/2/26,6/6/26,https://example.com/kickoff,Kickoff and scope alignment,0,Bob,Alice;Bob,,3,,1500.00,#3366cc,2,true
+2,Design,6/3/26,6/10/26,,UI and architecture design,25,Alice,,1:100.00,5,1,1.1,2200.00,#00aa00,1,false
+3,Build,6/5/26,6/20/26,,Implementation work,0,,,2:80.00;1:20.00,12,2,1.2,8500.00,,1,true
+4,QA,6/15/26,6/25/26,,Testing and stabilization,0,Carol,Carol,,8,3,1.3,900.00,#ff8800,1,false
+5,Release gate,6/25/26,6/25/26,,Milestone review,100,Bob,Bob,,0,4,1.4,0,#cccccc,4,true
+
+ID,Name,e-mail,Phone,Default role,Standard rate,Total cost,Total load
+1,Alice,alice@example.com,555-0100,Developer,75.00,,
+2,Bob,bob@example.com,555-0101,PM,90.00,,
+3,Carol,carol@example.com,555-0102,QA,65.00,,

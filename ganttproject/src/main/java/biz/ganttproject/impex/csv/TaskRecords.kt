@@ -33,6 +33,7 @@ import net.sourceforge.ganttproject.resource.HumanResourceManager
 import net.sourceforge.ganttproject.task.Task
 import net.sourceforge.ganttproject.task.TaskImpl
 import net.sourceforge.ganttproject.task.TaskManager
+import net.sourceforge.ganttproject.task.TaskManagerImpl
 import net.sourceforge.ganttproject.task.TaskProperties
 import net.sourceforge.ganttproject.task.dependency.TaskDependencyException
 import net.sourceforge.ganttproject.util.ColorConvertion
@@ -92,6 +93,7 @@ class TaskRecords(
   private val myPredecessorMap: MutableMap<Task, String?> = Maps.newHashMap()
   private val myWbsMap: SortedMap<String, Task> = Maps.newTreeMap(OUTLINE_NUMBER_COMPARATOR)
   private val myTaskIdMap: MutableMap<Int, Task> = Maps.newHashMap()
+  private val myCriticalFlags: MutableMap<Task, Boolean> = Maps.newHashMap()
 
   override fun doProcess(record: SpreadsheetRecord): Boolean {
     if (!super.doProcess(record)) {
@@ -171,6 +173,11 @@ class TaskRecords(
       builder = record.getInt(TaskDefaultColumn.ID.getName())?.let { builder.withId(it)} ?: builder
     }
     val task = builder.build()
+    getOrNull(record, TaskFields.IS_CRITICAL.toString())?.let { value ->
+      if (value.isNotBlank()) {
+        myCriticalFlags[task] = value.equals("true", ignoreCase = true)
+      }
+    }
     if (record.isSet(TaskFields.EARLIEST_BEGIN.toString()) && record.get(TaskFields.EARLIEST_BEGIN.toString()).isNullOrBlank().not()) {
       record.digDate(TaskFields.EARLIEST_BEGIN.toString(), this::addError)?.let {
         task.thirdDateConstraint = TaskImpl.EARLIESTBEGIN
@@ -259,6 +266,21 @@ class TaskRecords(
         GPLogger.logToLogger(e)
       }
     }
+    applyImportedCriticalFlags()
+  }
+
+  private fun applyImportedCriticalFlags() {
+    if (myCriticalFlags.isEmpty()) {
+      return
+    }
+    val taskManagerImpl = taskManager as TaskManagerImpl
+    taskManagerImpl.setEventsEnabled(false)
+    try {
+      myCriticalFlags.forEach { (task, critical) -> task.setCritical(critical) }
+    } finally {
+      taskManagerImpl.setEventsEnabled(true)
+    }
+    myCriticalFlags.clear()
   }
 }
 

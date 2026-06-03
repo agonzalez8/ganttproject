@@ -45,6 +45,7 @@ fun buildInsertTaskQuery(dsl: DSLContext, task: Task): Insert<TaskRecord> {
     .set(Tables.TASK.COLOR, (task as TaskImpl).externalizedColor())
     .set(Tables.TASK.SHAPE, task.shape?.array)
     .set(Tables.TASK.IS_MILESTONE, task.isLegacyMilestone)
+    .set(Tables.TASK.IS_CRITICAL, task.isCritical)
     .set(Tables.TASK.IS_PROJECT_TASK, task.isProjectTask)
     .set(Tables.TASK.START_DATE, task.start.toLocalDate())
     .set(Tables.TASK.END_DATE, task.end.toLocalDate())
@@ -86,6 +87,7 @@ fun buildInsertTaskDto(task: Task): OperationDto.InsertOperationDto {
       Tables.TASK.COLOR.name to (task as TaskImpl).externalizedColor(),
       Tables.TASK.SHAPE.name to task.shape?.array,
       Tables.TASK.IS_MILESTONE.name to task.isLegacyMilestone.toString(),
+      Tables.TASK.IS_CRITICAL.name to task.isCritical.toString(),
       Tables.TASK.IS_PROJECT_TASK.name to task.isProjectTask.toString(),
       Tables.TASK.START_DATE.name to task.start.toLocalDate().toString(),
       Tables.TASK.END_DATE.name to task.end.toLocalDate().toString(),

@@ -527,9 +527,8 @@ class SqlTaskUpdateBuilder(private val task: Task,
 
   override fun setNotes(oldValue: String?, newValue: String?) = appendUpdate(TASK.NOTES, oldValue, newValue)
 
-  override fun setCritical(oldValue: Boolean, newValue: Boolean) {
-    // TODO("Not yet implemented")
-  }
+  override fun setCritical(oldValue: Boolean, newValue: Boolean) =
+    appendUpdate(TASK.IS_CRITICAL, oldValue, newValue)
 
   override fun setProjectTask(oldValue: Boolean, newValue: Boolean) =
     appendUpdate(TASK.IS_PROJECT_TASK, oldValue, newValue)

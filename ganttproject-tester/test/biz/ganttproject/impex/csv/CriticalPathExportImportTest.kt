@@ -18,6 +18,8 @@
  */
 package biz.ganttproject.impex.csv
 
+import biz.ganttproject.app.DefaultLocalizer
+import biz.ganttproject.app.RootLocalizer
 import biz.ganttproject.core.model.task.TaskDefaultColumn
 import biz.ganttproject.core.time.TimeUnitStack
 import com.google.common.base.Supplier
@@ -41,6 +43,9 @@ class CriticalPathExportImportTest : TaskTestCase() {
 
   @Throws(Exception::class)
   override fun setUp() {
+    RootLocalizer = object : DefaultLocalizer() {
+      override fun formatTextOrNull(key: String, vararg args: Any): String? = key
+    }
     TaskDefaultColumn.setLocaleApi { key -> key }
     val builder = TestSetupHelper.newTaskManagerBuilder()
     taskManager = builder.build()
@@ -84,17 +89,11 @@ class CriticalPathExportImportTest : TaskTestCase() {
   }
 
   @Throws(Exception::class)
-  fun testImportIgnoresCriticalPath() {
-    // Prepare data with translated header names if possible, or just the keys if i18n is mocked to return keys
-    val csvData = ("tableColName,tableColIsCritical\n"
+  fun testImportCriticalPath() {
+    val criticalCol = TaskRecords.TaskFields.IS_CRITICAL.toString()
+    val csvData = ("${TaskRecords.TaskFields.NAME},$criticalCol\n"
       + "Task1,true\n"
       + "Task2,false\n")
-
-    TaskDefaultColumn.setLocaleApi(object : TaskDefaultColumn.LocaleApi {
-      override fun i18n(key: String?): String? {
-        return key
-      }
-    })
 
     val supplier: Supplier<InputStream?> = object : Supplier<InputStream?> {
       override fun get(): InputStream {
@@ -114,13 +113,9 @@ class CriticalPathExportImportTest : TaskTestCase() {
     val tasks = taskManager.getTasks()
     TestCase.assertEquals(2, tasks.size)
 
-    // GanttProject's critical path is calculated, so it should be false by default if no dependencies exist
-    // Even if we set it to true in CSV, it should be ignored.
-    for (task in tasks) {
-      assertFalse(
-        "Task " + task.getName() + " should not be critical as CSV import should ignore it",
-        task.isCritical()
-      )
-    }
+    val task1 = tasks.first { it.name == "Task1" }
+    val task2 = tasks.first { it.name == "Task2" }
+    TestCase.assertTrue("Task1 should be critical after CSV import", task1.isCritical())
+    TestCase.assertFalse("Task2 should not be critical after CSV import", task2.isCritical())
   }
 }
