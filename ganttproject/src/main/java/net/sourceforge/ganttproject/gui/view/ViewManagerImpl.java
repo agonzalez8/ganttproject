@@ -53,10 +53,12 @@ public class ViewManagerImpl implements GPViewManager {
   private final ViewDefinedAction propertiesAction = new ViewDefinedAction("artefact.properties");
   private final ViewDefinedAction deleteAction = new ViewDefinedAction("artefact.delete");
   private final List<ViewProvider> myViewProviders;
+  private final UIFacade myUiFacade;
   private boolean isInitialized = false;
 
   public ViewManagerImpl(IGanttProject project, UIFacade uiFacade, Supplier<GPUndoManager> undoManager, ViewPane viewPane,
                          List<ViewProvider> viewProviders) {
+    myUiFacade = uiFacade;
     myViewProviders = viewProviders;
     myViewPane = viewPane;
     project.addProjectEventListener(getProjectEventListener());
@@ -188,6 +190,14 @@ public class ViewManagerImpl implements GPViewManager {
       return existing.get();
     }
     var provider = myViewProviders.stream().filter(viewProvider -> id.equals(viewProvider.getId())).findFirst();
+    if (provider.isEmpty() && myUiFacade.getGanttViewProvider() != null
+        && id.equals(myUiFacade.getGanttViewProvider().getId())) {
+      provider = java.util.Optional.of(myUiFacade.getGanttViewProvider());
+    }
+    if (provider.isEmpty() && myUiFacade.getResourceViewProvider() != null
+        && id.equals(myUiFacade.getResourceViewProvider().getId())) {
+      provider = java.util.Optional.of(myUiFacade.getResourceViewProvider());
+    }
     if (provider.isPresent()) {
       return new UninitializedView(myViewPane, provider.get());
     } else {

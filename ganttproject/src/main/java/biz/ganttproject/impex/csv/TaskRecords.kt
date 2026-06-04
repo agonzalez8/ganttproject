@@ -353,6 +353,7 @@ class ResourceColumnSpecImpl(
       val resource = getIndexByName(resourceManager)!![name]
       if (resource != null) {
         val assignment = task.assignmentCollection.addAssignment(resource)
+        assignment.load = 100f
         if (myCoordinator != null && myCoordinator == name) {
           assignment.isCoordinator = true
         }

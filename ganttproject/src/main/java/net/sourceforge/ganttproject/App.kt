@@ -46,7 +46,6 @@ fun main(args: Array<String>) {
   _explicitTranslation = createTranslation(Locale.US, ResourceBundle.getBundle("i18n"))
   RootLocalizer = SingleTranslationLocalizer(defaultTranslation)
   var builder = AppBuilder(args).withLogging().withWindowVisible().runBeforeUi {
-    PluginManager.setViewProviders(listOf())
     GanttLanguage.getInstance()
   }
   if (getCloudEnv() == GPCloudEnv.EMULATOR) {

@@ -152,6 +152,8 @@ public class GPCsvImportTest extends TestCase {
       Map<String, HumanResource> resourceMap = buildResourceMap(resourceManager);
       assertNotNull(t1.getAssignmentCollection().getAssignment(resourceMap.get("Joe")));
       assertNotNull(t1.getAssignmentCollection().getAssignment(resourceMap.get("John")));
+      assertEquals(100f, t1.getAssignmentCollection().getAssignment(resourceMap.get("Joe")).getLoad());
+      assertEquals(100f, t1.getAssignmentCollection().getAssignment(resourceMap.get("John")).getLoad());
     }
   }
 

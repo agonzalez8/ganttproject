@@ -124,7 +124,8 @@ private val localizer = i18n {
     transform { key ->
       val map = mapOf(
         "0.label" to "gantt",
-        "1.label" to "resourcesChart"
+        "1.label" to "resourcesChart",
+        "pertChart.label" to "pertChartLongName"
       )
       map[key] ?: key
     }
@@ -153,12 +154,20 @@ private class ViewImpl(
     }
   }
 
-  override var isVisible: Boolean = true
+  override var isVisible: Boolean
+    get() = tabPane.tabs.contains(tab)
     set(value) {
       FXUtil.runLater {
-        if (value.not() && field) { tabPane.tabs.remove(tab) }
-        if (value && field.not()) { tabPane.tabs.add(tab) }
-        field = value
+        val present = tabPane.tabs.contains(tab)
+        if (!value && present) {
+          tabPane.tabs.remove(tab)
+        }
+        if (value && !present) {
+          tabPane.tabs.add(tab)
+          tabPane.selectionModel.select(tab)
+        } else if (value && present) {
+          tabPane.selectionModel.select(tab)
+        }
       }
     }
 
@@ -178,8 +187,16 @@ private class ViewImpl(
 class UninitializedView(private val viewPane: ViewPane, private val viewProvider: ViewProvider): View {
   override var isVisible: Boolean = false
     set(value) {
-      FXUtil.runLater {
-        viewPane.createView(viewProvider)
+      if (value == field) {
+        return
+      }
+      field = value
+      if (value) {
+        FXUtil.runLater {
+          val view = viewPane.createView(viewProvider)
+          view.isVisible = true
+          view.isActive = true
+        }
       }
     }
   override var isActive: Boolean = false

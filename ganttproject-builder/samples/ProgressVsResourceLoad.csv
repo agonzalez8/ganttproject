@@ -1,0 +1,8 @@
+Name,Begin date,End date,Completion,Resources,Assignments
+Half done but still full-time on Alice,6/2/26,6/6/26,50,Alice,
+Not started but only half capacity on Bob,6/2/26,6/6/26,0,,2:50.00
+Fully done and no resources,6/2/26,6/6/26,100,,
+
+ID,Name
+1,Alice
+2,Bob

@@ -51,6 +51,28 @@ public class ViewToggleAction extends GPAction {
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    myViewManager.getView(myViewProvider.getId()).setVisible(Boolean.TRUE == this.getValue(Action.SELECTED_KEY));
+    boolean visible;
+    if (e != null && e.getSource() instanceof JMenuItem) {
+      visible = ((JMenuItem) e.getSource()).isSelected();
+    } else {
+      // JavaFX CustomMenuItem invokes actionPerformed(null); checkbox state is in SELECTED_KEY.
+      Boolean selected = (Boolean) getValue(Action.SELECTED_KEY);
+      if (selected != null) {
+        visible = selected;
+      } else {
+        visible = !myViewManager.getView(myViewProvider.getId()).isVisible();
+        putValue(Action.SELECTED_KEY, visible);
+      }
+    }
+    var view = myViewManager.getView(myViewProvider.getId());
+    view.setVisible(visible);
+    if (visible) {
+      view.setActive(true);
+    }
+  }
+
+  /** Sync checkbox state with whether the view tab is actually open. */
+  public void syncFromView() {
+    putValue(Action.SELECTED_KEY, myViewManager.getView(myViewProvider.getId()).isVisible());
   }
 }

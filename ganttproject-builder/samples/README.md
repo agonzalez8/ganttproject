@@ -1,40 +1,56 @@
 # Sample project files
 
-## FullFeaturesImport.csv (and variants)
+All CSV examples are available in **three date formats**. Pick the file whose suffix matches your **Settings → date preview** (English column headers).
 
-CSV samples that exercise **all built-in task and resource columns**, including **Is critical**.
+| Suffix | Date format | Example |
+|--------|-------------|---------|
+| `.csv` | US **M/d/yy** | `6/2/26` |
+| `.dd-MM-yyyy.csv` | **dd/MM/yyyy** | `02/06/2026` |
+| `.de.csv` | German **dd.MM.yy** | `02.06.26` |
 
-| File | Use when your short date format is |
-|------|-------------------------------------|
-| `FullFeaturesImport.csv` | US-style **M/d/yy** (e.g. `6/2/26`) |
-| `FullFeaturesImport.dd-MM-yyyy.csv` | **dd/MM/yyyy** (e.g. `02/06/2026`, typical UK) |
-| `FullFeaturesImport.de.csv` | German **dd.MM.yy** (e.g. `02.06.26`) |
+**Project → Import** → choose the matching file. Headers must match your UI language (these use English).
 
-### Check your date format first
+---
 
-1. Open **Settings → UI** (or General).
-2. Find the date preview (“Today is …”).
-3. Use the matching sample file, **or** edit dates in the CSV so they match that preview **exactly** (including slashes vs dots and 2- vs 4-digit years).
+## ProgressVsResourceLoad
 
-GanttProject rejects dates that do not round-trip to the same string (e.g. `02/06/26` fails on US locale because it is stored as `2/6/26`).
+Shows that **Completion %** and **resource Unit %** are independent.
 
-### Column headers must match your UI language
+| Task | Completion | Resource / Unit | Lesson |
+|------|------------|-----------------|--------|
+| Half done but still full-time on Alice | **50%** | Alice, full (**100**) | Progress ≠ less load |
+| Not started but only half capacity on Bob | **0%** | Bob, **50** | Low Unit = part-time plan |
+| Fully done and no resources | **100%** | (none) | Done, no assignments |
 
-Headers must be the **translated column names** from your GanttProject language (e.g. English: `Name`, `Begin date`, `Is critical`). If the UI is Spanish, export a blank project once and copy header names from that file.
+| File |
+|------|
+| `ProgressVsResourceLoad.csv` |
+| `ProgressVsResourceLoad.dd-MM-yyyy.csv` |
+| `ProgressVsResourceLoad.de.csv` |
 
-### How to import
+After import, check the **Resources** chart: Alice stays fully loaded for the full date range at 50% completion.
 
-1. Pick the CSV variant that matches your **date format** and **language**.
-2. **Project → Import** → select the file.
-3. Review the import report; warnings about dates or unknown columns usually mean a locale mismatch.
+The **Resources** column assigns people at **100%** unit load (same as adding them in the UI). Use **Assignments** (`1:50.00`) when you need a different load.
 
-### Column reference (English UI)
+---
 
-**Tasks:** ID, Name (required), Begin date, End date, Web Link, Notes, Completion, Coordinator, Resources (`Alice;Bob`), Assignments (`1:100.00`), Duration, Predecessors (`1` or `2-FS=P2D`), Outline number, Cost, Task color, Priority (`0`–`4`), Is critical (`true`/`false`).
+## FullFeaturesImport
 
-**Resources** (after a blank line): ID, Name (required), e-mail, Phone, Default role, Standard rate, Total cost, Total load.
+All built-in task and resource columns, including **Is critical**.
 
-### Related
+| File |
+|------|
+| `FullFeaturesImport.csv` |
+| `FullFeaturesImport.dd-MM-yyyy.csv` |
+| `FullFeaturesImport.de.csv` |
+
+**Tasks:** ID, Name, Begin/End date, Web Link, Notes, Completion, Coordinator, Resources, Assignments, Duration, Predecessors, Outline number, Cost, Task color, Priority, Is critical.
+
+**Resources** (after a blank line): ID, Name, e-mail, Phone, Default role, Standard rate, Total cost, Total load.
+
+---
+
+## Related
 
 - `HouseBuildingSample.gan` — native `.gan` sample
 - `docs/ADDING_NEW_TASK_COLUMN.md` — column implementation notes

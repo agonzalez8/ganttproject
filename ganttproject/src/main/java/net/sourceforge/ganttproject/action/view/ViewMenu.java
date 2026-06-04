@@ -20,32 +20,81 @@ package net.sourceforge.ganttproject.action.view;
 
 import biz.ganttproject.core.option.FontOption;
 import biz.ganttproject.core.option.IntegerOption;
-import net.sourceforge.ganttproject.IGanttProject;
 import net.sourceforge.ganttproject.action.GPAction;
 import net.sourceforge.ganttproject.action.ViewToggleAction;
+import net.sourceforge.ganttproject.gui.UIFacade;
 import net.sourceforge.ganttproject.gui.view.GPViewManager;
 import net.sourceforge.ganttproject.gui.view.ViewProvider;
 import net.sourceforge.ganttproject.plugins.PluginManager;
 
 import javax.swing.*;
+import java.awt.Component;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Collection of actions present in the view menu
  */
 public class ViewMenu extends JMenu {
-  public ViewMenu(final IGanttProject project, GPViewManager viewManager, IntegerOption dpiOption, FontOption chartFontOption, String key) {
+  public ViewMenu(GPViewManager viewManager, UIFacade uiFacade, IntegerOption dpiOption,
+      FontOption chartFontOption, String key) {
     super(GPAction.createVoidAction(key));
 
-    List<ViewProvider> charts = PluginManager.getViewProviders();
+    List<ViewProvider> charts = buildViewProviderList(uiFacade);
     if (charts.isEmpty()) {
       setEnabled(false);
     }
     for (ViewProvider viewProvider : charts) {
       var action = new ViewToggleAction(viewManager, viewProvider);
+      action.syncFromView();
       action.updateAction();
       add(new JCheckBoxMenuItem(action));
     }
+    addMenuListener(new javax.swing.event.MenuListener() {
+      @Override
+      public void menuSelected(javax.swing.event.MenuEvent e) {
+        syncToggleActions();
+      }
+
+      @Override
+      public void menuDeselected(javax.swing.event.MenuEvent e) {}
+
+      @Override
+      public void menuCanceled(javax.swing.event.MenuEvent e) {}
+    });
     setToolTipText(null);
+  }
+
+  private void syncToggleActions() {
+    for (int i = 0; i < getMenuComponentCount(); i++) {
+      Component component = getMenuComponent(i);
+      if (component instanceof JCheckBoxMenuItem) {
+        Action action = ((JCheckBoxMenuItem) component).getAction();
+        if (action instanceof ViewToggleAction) {
+          ((ViewToggleAction) action).syncFromView();
+        }
+      }
+    }
+  }
+
+  private static List<ViewProvider> buildViewProviderList(UIFacade uiFacade) {
+    List<ViewProvider> charts = new ArrayList<>();
+    Set<String> ids = new HashSet<>();
+    ViewProvider gantt = uiFacade.getGanttViewProvider();
+    if (gantt != null && ids.add(gantt.getId())) {
+      charts.add(gantt);
+    }
+    ViewProvider resources = uiFacade.getResourceViewProvider();
+    if (resources != null && ids.add(resources.getId())) {
+      charts.add(resources);
+    }
+    for (ViewProvider plugin : PluginManager.getViewProviders()) {
+      if (plugin != null && ids.add(plugin.getId())) {
+        charts.add(plugin);
+      }
+    }
+    return charts;
   }
 }
